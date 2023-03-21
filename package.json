@@ -1,0 +1,22 @@
+{
+  "name": "adif-to-json-converter",
+  "version": "1.0.0",
+  "description": "Convert ADIF files to JSON, and JSON to ADIF",
+  "main": "src/AdifToJsonConverter.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "ADIF",
+    "JSON",
+    "converter"
+  ],
+  "author": "Jarrett Green",
+  "license": "MIT",
+  "dependencies": {
+    "fetch": "^1.1.0"
+  },
+  "devDependencies": {
+    "jest": "^27.2.3"
+  }
+}
