@@ -1,54 +1,28 @@
 class AdifToJsonConverter {
-  constructor(adifFile) {
-    this.adifFile = adifFile;
+  constructor(adifString) {
+    this.adifString = adifString;
   }
 
-  async convert() {
-    const adifText = await this.readFile();
-    const records = this.parseAdif(adifText);
-    return this.convertRecordsToJson(records);
-  }
-
-  async readFile() {
-    const response = await fetch(this.adifFile);
-    const text = await response.text();
-    return text;
-  }
-
-  parseAdif(adifText) {
-    const records = [];
-    const lines = adifText.split("\n");
-    let record = {};
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (line.startsWith("<") && line.endsWith(">")) {
-        const tag = line.substring(1, line.length - 1);
-        const value = line.substring(line.indexOf(">") + 1);
-        if (tag === "EOR") {
-          records.push(record);
-          record = {};
-        } else {
-          record[tag] = value;
-        }
-      }
+  convert() {
+    if (!this.adifString || !this.adifString.trim()) {
+      return [];
     }
-    return records;
-  }
+    // Split the ADIF data at the EOH (End of Header) tag
+    const adifArray = this.adifString.split("<EOH>\n")[1].split("<EOR>\n");
+    const jsonObjects = [];
 
-  convertRecordsToJson(records) {
-    const json = [];
-    for (let i = 0; i < records.length; i++) {
-      const record = records[i];
-      const jsonRecord = {};
-      for (const key in record) {
-        if (record.hasOwnProperty(key)) {
-          jsonRecord[key] = record[key];
-        }
+    for (let i = 0; i < adifArray.length - 1; i++) {
+      const adifObject = adifArray[i];
+      const jsonObject = {};
+      const fields = adifObject.split("<");
+      for (let j = 1; j < fields.length; j++) {
+        const field = fields[j].split(":")[0].toLowerCase();
+        const value = fields[j].split(">")[1].trim();
+        jsonObject[field] = value;
       }
-      json.push(jsonRecord);
+      jsonObjects.push(jsonObject);
     }
-    return json;
+    return jsonObjects;
   }
 }
-
-export default AdifToJsonConverter
+module.exports = AdifToJsonConverter;
